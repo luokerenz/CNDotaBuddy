@@ -10,9 +10,9 @@ CNDotaBuddy
     * 按 **Insert** 来开始肉山/不朽盾计时器 (按 **Cmd或Ctrl+Alt+Insert** 来清除肉山/不朽盾计时器)
     * 按 **Alt+Insert** 来开始肉山计时器
     * 按 **Home** 来开始不朽盾计时器 (按 **Cmd或Ctrl+Alt+Home** 来清除不朽盾计时器)
-
-* 使用计时器需要的额外操作：
-	* 添加一个名为 `gamestate_integration_dotabuddy.cfg` 的文件在 `path\to\steamapps\common\dota 2 beta\game\dota\cfg\gamestate_integration` 目录下， 文件内容如下：
+    * 使用计时器需要的额外操作：
+    
+添加一个名为 `gamestate_integration_dotabuddy.cfg` 的文件在 `path\to\steamapps\common\dota 2 beta\game\dota\cfg\gamestate_integration` 目录下， 文件内容如下：
 
     "Dota 2 Integration Configuration"
 	{

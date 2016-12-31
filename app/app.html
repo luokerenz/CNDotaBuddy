@@ -1,0 +1,181 @@
+<!doctype html>
+<html xmlns:v-on="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+
+    <link rel="stylesheet" href="css/material-icons.css"/>
+    <link rel="stylesheet" href="stylesheets/materialize.css"  media="screen,projection"/>
+    <link rel="stylesheet" href="css/perfect-scrollbar.min.css"/>
+</head>
+<body>
+    <nav class="drag primary">
+        <div class="nav-wrapper">
+            <a href="#" class="brand-logo center">{{ title }}</a>
+            <ul class="right">
+                <li class="minimize"><a><i class="material-icons">remove</i></a></li>
+                <li class="maximize"><a><i class="material-icons">expand_less</i></a></li>
+                <li class="close"><a><i class="material-icons">close</i></a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="row" style="padding: 0; margin: 0;">
+        <ul class="tabs z-depth-1">
+            <li class="tab col s6"><a href="#stats">玩家状态</a></li>
+            <li class="tab col s6"><a href="#timers">计时器</a></li>
+        </ul>
+    </div>
+    <main>
+        <div class="container">
+            <div class="row">
+                <div id="stats" class="col s12">
+                    <div class="row">
+                        <div class="col s12">
+                            <form>
+                                <div class="file-field input-field col s12">
+                                    <div class="btn secondary waves-effect" id="serverlog-locate">
+                                        <span>指定server_log.txt位置</span>
+                                    </div>
+                                    <div class="file-path-wrapper">
+                                        <input id="serverlog-path" type="text">
+                                    </div>
+                                </div>
+                                <div class="input-field col s12">
+                                    <input id="steam-api-key" type="text" placeholder="你的Steam API Key"/>
+                                    <label for="steam-api-key">Steam API Key</label>
+                                    <a class="secondary-text" href="http://steamcommunity.com/dev/apikey" target="_blank" style="text-decoration: underline;">点击这里来获取Steam API key</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <p class="col s12" style="margin-top: 0;">
+                            <button id="reparse" class="btn secondary waves-effect"><i class="material-icons left">refresh</i> 重新获取上一次比赛</button>
+                            <strong class="secondary-text" style="padding-left: 10px;">状态:</strong> <span id="serverlog-status">空闲...</span>
+                        </p>
+                        <div class="col s12">
+                            <ul id="radiant" class="collapsible players radiant" data-collapsible="expandable">
+                                <li class="header" data-state="open">
+                                    <div class="collapsible-header green darken-2">天辉</div>
+                                </li>
+                                <li v-for="player in players" class="player">
+                                    <div class="collapsible-header primary" :class="[player.status == 15 ? '' : 'active']"><img class="circle" :src="player.user.avatarmedium"/>{{ player.user.personaname }} <a class="secondary-text" :href="player.user.profileurl" target="_blank">[Steam]</a> <a class="secondary-text" :href="'http://www.dotabuff.com/players/' + player.accountId" target="_blank">[Dotabuff]</a> <a class="secondary-text" :href="'http://opendota.com/players/' + player.accountId" target="_blank">[OpenDota]</a> <span class="material-icons">person</span> {{ player.solo_mmr }} <span class="material-icons">people</span> {{ player.party_mmr }} <span class="material-icons">help</span> {{ player.estimated_mmr }}</div>
+                                    <div class="collapsible-body">
+                                        <div v-for="hero in player.heroes" :class="[hero.match_id === undefined ? 'hidden' : '']">
+                                            <a class="white-text" :href="'https://www.opendota.com/matches/' + hero.match_id" target="_blank">
+                                                <img :src="hero.img"/>
+                                                <div class="center" :class="[hero.win ? 'won' : 'lost']">
+                                                    <span class="gpm-xpm" style="display: none; font-size: 12px">{{ hero.gpm }}<span style="font-size: 9px; display: inline;">GPM</span> {{ hero.xpm }}<span style="font-size: 9px; display: inline;">XPM</span></span>
+                                                    <span class="kda" style="display: block;">{{ hero.kda }}</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <span class="center" style="width: 100%;" v-if="player.status == 15">比赛数据不公开</span>
+                                    </div>
+                                </li>
+                            </ul>
+
+                            <ul id="dire" class="collapsible players dire" data-collapsible="expandable">
+                                <li class="header" data-state="open">
+                                    <div class="collapsible-header materialize-red darken-4">夜魇</div>
+                                </li>
+                                <li v-for="player in players" class="player">
+                                    <div class="collapsible-header primary" :class="[player.status == 15 ? '' : 'active']"><img class="circle" :src="player.user.avatarmedium"/>{{ player.user.personaname }} <a class="secondary-text" :href="player.user.profileurl" target="_blank">[Steam]</a> <a class="secondary-text" :href="'http://www.dotabuff.com/players/' + player.accountId" target="_blank">[Dotabuff]</a> <a class="secondary-text" :href="'http://opendota.com/players/' + player.accountId" target="_blank">[OpenDota]</a> <span class="material-icons">person</span> {{ player.solo_mmr }} <span class="material-icons">people</span> {{ player.party_mmr }} <span class="material-icons">help</span> {{ player.estimated_mmr }}</div>
+                                    <div class="collapsible-body">
+                                        <div v-for="hero in player.heroes" :class="[hero.match_id === undefined ? 'hidden' : '']">
+                                            <a class="white-text" :href="'https://www.opendota.com/matches/' + hero.match_id" target="_blank">
+                                                <img :src="hero.img"/>
+                                                <div class="center" :class="[hero.win ? 'won' : 'lost']">
+                                                    <span class="gpm-xpm" style="display: block; font-size: 12px">{{ hero.gpm }}<span style="font-size: 9px; display: inline;">GPM</span> {{ hero.xpm }}<span style="font-size: 9px; display: inline;">XPM</span></span>
+                                                    <span class="kda" style="display: block;">{{ hero.kda }}</span>
+                                                </div>
+                                            </a>
+                                        </div>
+                                        <span class="center" style="width: 100%;" v-if="player.status == 15">比赛数据不公开</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="timers" class="col s12" style="display: none;">
+                    <div class="row">
+                        <p class="col s12">
+                            <strong class="secondary-text">游戏监视状态： </strong> <span id="gsi-status">未激活</span>
+                        </p>
+                        <div class="col s12">
+                            <br/>
+                            <div class="switch">
+                                <label>
+                                    <span class="grey-text text-lighten-3" style="font-size: 1rem;">关闭肉山/不朽之守护计时器</span>
+                                    <input type="checkbox" id="disable-timers">
+                                    <span class="lever"></span>
+                                </label>
+                            </div>
+                            <br/>
+                            <div class="switch">
+                                <label>
+                                    <span class="grey-text text-lighten-3" style="font-size: 1rem;">只关闭聊天脚本</span>
+                                    <input type="checkbox" id="disable-chat-macros">
+                                    <span class="lever"></span>
+                                </label>
+                            </div>
+                            <br/>
+                            <ul>
+                                <li>按 <strong>Insert</strong> 打开肉山/不朽之守护计时器 (按<strong>Cmd或Ctrl+Alt+Insert</strong>清除肉山/不朽之守护计时器)</li>
+                                <li>按 <strong>Alt+Insert</strong> 只开始肉山计时器</li>
+                                <li>按 <strong>Home</strong> 只开始不朽之守护计时器(按<strong>Cmd或Ctrl+Alt+Home</strong>来清除计时器)</li>
+                            </ul>
+                        </div>
+                        <p class="col s12"></p>
+                        <div class="col l8 offset-l2 s12">
+                            <div class="row">
+                                <div class="col s6 dota-timer" id="roshan-timer">
+                                    <div class="content-container">
+                                        <img src="img/roshan.png"/>
+                                    </div>
+                                    <div class="timer-progress"></div>
+                                </div>
+                                <div class="col s6 dota-timer" id="aegis-timer">
+                                    <div class="content-container">
+                                        <img src="img/aegis.png"/>
+                                    </div>
+                                    <div class="timer-progress"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="update" class="modal modal-fixed-footer">
+        <div class="modal-content">
+            <h4>CNDotaBuddy {{ version }} - 更新可用</h4>
+            <div class="update">
+                {{{ description }}}
+                <h2>下载</h2>
+                <ul>
+                    <li v-for="asset in assets">
+                        <a class="secondary-text" :href="asset.browser_download_url" target="_blank">{{ asset.name }} ({{ (asset.size / 1024 / 1024).toFixed(1) }} MB)</a>
+                    </li>
+                </ul>
+                <a class="secondary-text" :href="url" target="_blank" style="text-decoration: underline;">在GitHub查看</a>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+        </div>
+    </div>
+
+    <script>if (typeof module === 'object') {window.module = module; module = undefined;}</script>
+    <script src="js/vue.js"></script>
+    <script src="js/jquery-2.2.4.min.js"></script>
+    <script src="js/materialize.min.js"></script>
+    <script src="js/perfect-scrollbar.jquery.min.js"></script>
+    <script src="helpers/context_menu.js"></script>
+    <script src="app.js"></script>
+    <script>if (window.module) module = window.module;</script>
+</body>
+</html>
